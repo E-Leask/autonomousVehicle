@@ -1,0 +1,67 @@
+What am I looking at 
+MPU 9250
+
+ MPU9250 Breakout --------- Arduino
+ VDD ---------------------- 3.3V
+ VDDI --------------------- 3.3V
+ SDA ----------------------- A4  	(I2C)
+ SCL ----------------------- A5		(I2C)
+ GND ---------------------- GND
+ 
+  SDA and SCL should have external pull-up resistors (to 3.3V).
+ 10k resistors are on the EMSENSR-9250 breakout board.
+ 
+ Serial.begin(38400);
+ 
+ First Error:
+ 
+MPU9250 I AM FF I should be 71 #Done
+
+	Could not connect to MPU9250: 0xFF Why?
+	Tried 2.2k pull up resistor (pull down definitely not right)
+	Without the pull-up resistor & difff code it reads
+	MPU9250 I AM 71 I should be 71
+		ADO = 0 Solves issue
+
+
+Calibration: How?
+Bias' produces for the magnetometer
+	No calibration is done?
+	https://github.com/kriswiner/MPU6050/wiki/Simple-and-Effective-Magnetometer-Calibration
+	MPU9250Mmode
+		// Configure the magnetometer for continuous read and highest resolution
+		// set Mscale bit 4 to 1 (0) to enable 16 (14) bit resolution in CNTL register,
+		// and enable continuous mode data acquisition Mmode (bits [3:0]), 0010 for 8 Hz and 0110 for 100 Hz sample rates
+		writeByte(AK8963_ADDRESS, AK8963_CNTL, Mscale << 4 | Mmode); // Set magnetometer data resolution and sample ODR
+		0001 -> 1000 | 0010 = 1010
+		
+Vars missing from MagCal
+			MPU9250Mmode Mmode 	#done
+			readMagData 		#done
+			MPU9250mRes mRes 	#dbne
+			MPU9250magCalibration magCalibration #done
+			
+dest1 dest2 MagCal?
+	magcalMPU9250(magBias,magScale); dest1 magBias, dest2 magScale 
+
+AK8963 I AM FF I should be 48
+	These values should occur before accessing Magnetometer
+	writeByte(MPU9250_ADDRESS, INT_ENABLE, 0x01)
+	writeByte(MPU9250_ADDRESS, INT_PIN_CFG, 0x22);
+	Solved:Missing Function
+	https://github.com/kriswiner/MPU9250/issues/3
+	
+MagCal Issues understand these values	
+	Magbias :  values are overwritten
+	magCalibration 	: 	Defined in initAK8963
+	mRes		: getMres
+	mag_scale == magCalibration?
+
+Cal data to use for now
+0.88
+1.04
+1.11
+	
+	
+ 
+ 
