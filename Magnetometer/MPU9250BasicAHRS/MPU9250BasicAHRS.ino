@@ -51,7 +51,7 @@ enum Mscale { //magnetometer
 uint8_t Gscale = GFS_250DPS;
 uint8_t Ascale = AFS_2G;
 uint8_t Mscale = MFS_16BITS; // Choose either 14-bit or 16-bit magnetometer resolution
-uint8_t Mmode = 0x02;        // 2 for 8 Hz, 6 for 100 Hz continuous magnetometer data read
+uint8_t Mmode = 0x06;        // 2 for 8 Hz, 6 for 100 Hz continuous magnetometer data read
 float aRes, gRes, mRes;      // scale resolutions per LSB for the sensors
 
 // Pin definitions
@@ -61,7 +61,11 @@ int myLed = 13; // Set up pin 13 led for toggling
 int16_t accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
 int16_t gyroCount[3];   // Stores the 16-bit signed gyro sensor output
 int16_t magCount[3];    // Stores the 16-bit signed magnetometer sensor output
-float magCalibration[3] = {0, 0, 0}, magbias[3] = {+470., +120., +125.}, magscale[3] = {0, 0, 0};  // Factory mag calibration and mag bias
+float magCalibration[3] = {0, 0, 0};
+//float magbias[3] = {+470., +120., +125.}; 
+float magbias[3] = {0,0,0}; 
+
+float magscale[3] = {0, 0, 0};  // Factory mag calibration and mag bias
 
 float gyroBias[3] = {0, 0, 0}, accelBias[3] = {0, 0, 0};      // Bias corrections for gyro and accelerometer
 int16_t tempCount;      // temperature raw count output
@@ -144,10 +148,10 @@ void magSetup()
         // Get magnetometer calibration from AK8963 ROM
         initAK8963(magCalibration); 
         Serial.println("AK8963 initialized for active data mode...."); // Initialize device for active mode read of magnetometer
-        //magcalMPU9250(magbias,magCalibration);
-        magCalibration[0]=0.88;
-        magCalibration[1]=1.04;
-        magCalibration[2]=1.11;
+        magcalMPU9250(magbias,magCalibration);
+        //magCalibration[0]=0.88;
+        //magCalibration[1]=1.04;
+        //magCalibration[2]=1.11;
         if(SerialDebug) {
             //  Serial.println("Calibration values: ");
             Serial.print("X-Axis sensitivity adjustment value "); Serial.println(magCalibration[0], 2);
