@@ -1,6 +1,6 @@
 #include <SPI.h>
 #include <Wire.h>   
-#include <Adafruit_GFX.h>
+//#include <Adafruit_GFX.h>
 //#include <iostream>
 //#include <fstream>
 //#include <Adafruit_PCD8544.h>

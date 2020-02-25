@@ -33,7 +33,7 @@ void setup()
   Wire.begin();
 //  TWBR = 12;  // 400 kbit/sec I2C speed
   Serial.begin(38400);
-  Serial.println("LPlease work :("); 
+  
   // Set up the interrupt pin, its set as active high, push-pull
   pinMode(intPin, INPUT);
   digitalWrite(intPin, LOW);
@@ -165,7 +165,7 @@ void loop()
     readMagData(magCount);  // Read the x/y/z adc values
     getMres();
     magbias[0] = +470.;  // User environmental x-axis correction in milliGauss, should be automatically calculated
-    magbias[1] = +120.;  // User environmental x-axis correction in milliGauss
+    magbias[1] = -75.;  // User environmental x-axis correction in milliGauss
     magbias[2] = +125.;  // User environmental x-axis correction in milliGauss
     
     // Calculate the magnetometer values in milliGauss
@@ -286,7 +286,7 @@ void loop()
     roll  = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
     pitch *= 180.0f / PI;
     yaw   *= 180.0f / PI; 
-    yaw   -= 13.8; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
+    yaw   -= -10.8; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
     roll  *= 180.0f / PI;
      
     if(SerialDebug) {
