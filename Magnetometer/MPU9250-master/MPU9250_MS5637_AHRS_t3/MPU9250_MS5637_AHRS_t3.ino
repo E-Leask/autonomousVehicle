@@ -254,7 +254,7 @@ int16_t accelCount[3];  // Stores the 16-bit signed accelerometer sensor output
 int16_t gyroCount[3];   // Stores the 16-bit signed gyro sensor output
 int16_t magCount[3];    // Stores the 16-bit signed magnetometer sensor output
 float magCalibration[3] = {0, 0, 0};  // Factory mag calibration and mag bias
-int16_t gyroBias[3] = {0, 0, 0}, accelBias[3] = {0, 0, 0}, magBias[3] = {0, 0, 0}, magScale[3]  = {0, 0, 0};      // Bias corrections for gyro and accelerometer
+float gyroBias[3] = {0, 0, 0}, accelBias[3] = {0, 0, 0}, magBias[3] = {0, 0, 0}, magScale[3]  = {0, 0, 0};      // Bias corrections for gyro and accelerometer
 int16_t tempCount;            // temperature raw count output
 float   temperature;          // Stores the MPU9250 gyro internal chip temperature in degrees Celsius
 
@@ -291,13 +291,16 @@ float eInt[3] = {0.0f, 0.0f, 0.0f};       // vector to hold integral error for M
 
 void setup()
 {
-  Wire.begin();
+ 
   //  TWBR = 12;  // 400 kbit/sec I2C speed for Pro Mini
   // Setup for Master mode, pins 18/19, external pullups, 400kHz for Teensy 3.1
   //Wire.begin(I2C_MASTER, 0x00, I2C_PINS_16_17, I2C_PULLUP_EXT, I2C_RATE_400);
+  
+  Serial.begin(115200);
+  
+  Wire.begin();
+  
   delay(4000);
-  Serial.begin(38400);
-
   // Set up the interrupt pin, its set as active high, push-pull
   pinMode(intPin, INPUT);
   pinMode(myLed, OUTPUT);
@@ -368,7 +371,7 @@ void setup()
 
     delay(1000);
 
-    attachInterrupt(intPin, myinthandler, RISING);  // define interrupt for INT pin output of MPU9250
+    attachInterrupt(digitalPinToInterrupt(intPin), myinthandler, RISING);  // define interrupt for INT pin output of MPU9250
 
   }
   else
@@ -381,6 +384,9 @@ void setup()
 
 void loop()
 {
+    Serial.println("newdata:");
+    Serial.println("newdata:");
+  Serial.println(newData); 
   // If intPin goes high, all data registers have new data
   if (newData == true) { // On interrupt, read data
     newData = false;  // reset newData flag
@@ -437,7 +443,7 @@ void loop()
   delt_t = millis() - count;
   if (delt_t > 500) { // update LCD once per half-second independent of read rate
 
-    if (SerialDebug) {
+    if (0) {
       Serial.print("ax = "); Serial.print((int)1000 * ax);
       Serial.print(" ay = "); Serial.print((int)1000 * ay);
       Serial.print(" az = "); Serial.print((int)1000 * az); Serial.println(" mg");
@@ -468,14 +474,14 @@ void loop()
     // applied in the correct order which for this configuration is yaw, pitch, and then roll.
     // For more see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles which has additional links.
     //Software AHRS:
-    //   yaw   = atan2f(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
-    //   pitch = -asinf(2.0f * (q[1] * q[3] - q[0] * q[2]));
-    //   roll  = atan2f(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
-    //   pitch *= 180.0f / PI;
-    //   yaw   *= 180.0f / PI;
-    //   yaw   += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
-    //   if(yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
-    //   roll  *= 180.0f / PI;
+    //yaw   = atan2f(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
+    //pitch = -asinf(2.0f * (q[1] * q[3] - q[0] * q[2]));
+    //roll  = atan2f(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
+    //pitch *= 180.0f / PI;
+    //yaw   *= 180.0f / PI;
+    //yaw   += 13.8f; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
+    //if(yaw < 0) yaw   += 360.0f; // Ensure yaw stays between 0 and 360
+    //roll  *= 180.0f / PI;
     a12 =   2.0f * (q[1] * q[2] + q[0] * q[3]);
     a22 =   q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3];
     a31 =   2.0f * (q[0] * q[1] + q[2] * q[3]);
@@ -500,18 +506,18 @@ void loop()
       Serial.print(", ");
       Serial.println(roll, 2);
 
-      Serial.print("Grav_x, Grav_y, Grav_z: ");
-      Serial.print(-a31 * 1000, 2);
-      Serial.print(", ");
-      Serial.print(-a32 * 1000, 2);
-      Serial.print(", ");
-      Serial.print(a33 * 1000, 2);  Serial.println(" mg");
-      Serial.print("Lin_ax, Lin_ay, Lin_az: ");
-      Serial.print(lin_ax * 1000, 2);
-      Serial.print(", ");
-      Serial.print(lin_ay * 1000, 2);
-      Serial.print(", ");
-      Serial.print(lin_az * 1000, 2);  Serial.println(" mg");
+//      Serial.print("Grav_x, Grav_y, Grav_z: ");
+//      Serial.print(-a31 * 1000, 2);
+//      Serial.print(", ");
+//      Serial.print(-a32 * 1000, 2);
+//      Serial.print(", ");
+//      Serial.print(a33 * 1000, 2);  Serial.println(" mg");
+//      Serial.print("Lin_ax, Lin_ay, Lin_az: ");
+//      Serial.print(lin_ax * 1000, 2);
+//      Serial.print(", ");
+//      Serial.print(lin_ay * 1000, 2);
+//      Serial.print(", ");
+//      Serial.print(lin_az * 1000, 2);  Serial.println(" mg");
 
       Serial.print("rate = "); Serial.print((float)sumCount / sum, 2); Serial.println(" Hz");
     }
