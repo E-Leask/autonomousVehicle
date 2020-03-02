@@ -384,12 +384,13 @@ void setup()
 
 void loop()
 {
-    Serial.println("newdata:");
-    Serial.println("newdata:");
-  Serial.println(newData); 
+   
   // If intPin goes high, all data registers have new data
-  if (newData == true) { // On interrupt, read data
-    newData = false;  // reset newData flag
+  if (readByte(MPU9250_ADDRESS, INT_STATUS) & 0x01) {
+  //Eric Note: Using the intpin for interruopts have not been working successfully , therefore resorting 
+  //to the original technique used to read the interrupt directly from the register
+  //if (newData == true) { // On interrupt, read data
+    //newData = false;  // reset newData flag
     readMPU9250Data(MPU9250Data); // INT cleared on any read
     //   readAccelData(accelCount);  // Read the x/y/z adc values
 
@@ -910,7 +911,7 @@ void magcalMPU9250(float * dest1, float * dest2)
 
   // shoot for ~fifteen seconds of mag data
   if (Mmode == 0x02) sample_count = 128; // at 8 Hz ODR, new mag data is available every 125 ms
-  if (Mmode == 0x06) sample_count = 1500; // at 100 Hz ODR, new mag data is available every 10 ms
+  if (Mmode == 0x06) sample_count = 4500; // at 100 Hz ODR, new mag data is available every 10 ms
   for (ii = 0; ii < sample_count; ii++) {
     readMagData(mag_temp);  // Read the mag data
     for (int jj = 0; jj < 3; jj++) {

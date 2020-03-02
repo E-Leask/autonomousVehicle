@@ -164,6 +164,8 @@ void loop()
   
     readMagData(magCount);  // Read the x/y/z adc values
     getMres();
+    
+  //Eric Note: Once we know what the proper mag bias is we should skip calibration
     magbias[0] = +470.;  // User environmental x-axis correction in milliGauss, should be automatically calculated
     magbias[1] = -75.;  // User environmental x-axis correction in milliGauss
     magbias[2] = +125.;  // User environmental x-axis correction in milliGauss

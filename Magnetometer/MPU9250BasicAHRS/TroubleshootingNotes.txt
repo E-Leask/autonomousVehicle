@@ -62,6 +62,8 @@ Cal data to use for now
 1.04
 1.11
 	
-	
+About to redo calibration with updated version of the code.
+So far the yaw readings are looking great!
+Will have finalized values soon, and then can leave the imu behind!	
  
  
